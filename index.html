@@ -3,19 +3,987 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Simple HTML Page</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Queen's Quest: The Buttonhouse Run - Age Dynamics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a2e; 
+            color: #e0e0e0;
+            overscroll-behavior: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+        }
+        #game-wrapper {
+            position: relative;
+            width: 800px; 
+            height: 600px; 
+            border-radius: 16px;
+            overflow: hidden; 
+        }
+        canvas {
+            display: block;
+            background-color: #2a2a3e; 
+            border-radius: 16px; 
+            image-rendering: pixelated; 
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            box-sizing: border-box;
+            z-index: 10; 
+        }
+        .stats-bar-graphical {
+            display: flex;
+            justify-content: space-around;
+            background-color: rgba(40, 40, 60, 0.85); 
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            margin-bottom:10px;
+        }
+        .stat-item-graphical {
+            color: #e0c6f0; 
+            font-size: 0.9em;
+            text-align: center;
+        }
+        .stat-item-graphical del {
+            color: #ff8080; /* Lighter red for strikethrough */
+            margin-right: 4px;
+        }
+        .services-display-graphical {
+            background-color: rgba(40, 40, 60, 0.85);
+            padding: 8px;
+            border-radius: 8px;
+            margin-top: 8px;
+            max-height: 70px;
+            overflow-y: auto;
+        }
+        .services-display-graphical h3 {
+            font-size: 0.9em;
+            color: #c4a8e1; 
+            margin-bottom: 4px;
+        }
+        .services-list-graphical span {
+            background-color: #8a4cac; 
+            color: white;
+            padding: 3px 7px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.75); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 15px;
+        }
+        .modal-content {
+            background-color: #f0e2f7; 
+            color: #3d2c5a; 
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        .btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border: none;
+        }
+        .btn-primary { background-color: #8a4cac; color: white; }
+        .btn-primary:hover { background-color: #703d8c; }
+        .btn-secondary { background-color: #e0c6f0; color: #3d2c5a; }
+        .btn-secondary:hover { background-color: #d0b0e0; }
+        .btn-danger { background-color: #e53e3e; color: white; }
+        .btn-danger:hover { background-color: #c53030; }
+        .quark-tag { background-color: #c4a8e1; color: #3d2c5a; padding: 4px 8px; border-radius: 6px; font-size: 0.8em; margin-right: 4px; margin-bottom: 4px; display: inline-block; }
+        
+        .modal-content::-webkit-scrollbar { width: 8px; }
+        .modal-content::-webkit-scrollbar-track { background: #dcd0ea; border-radius: 10px; }
+        .modal-content::-webkit-scrollbar-thumb { background: #8a4cac; border-radius: 10px; }
+        .modal-content::-webkit-scrollbar-thumb:hover { background: #703d8c; }
+
+        #messageBox {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #8a4cac; 
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, bottom 0.5s ease-in-out;
+            text-align: center;
+        }
+        #messageBox.show { opacity: 1; bottom: 40px; }
+        .interaction-prompt {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #3d2c5a;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 50; 
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to My Page</h1>
-    </header>
-    <main>
-        <p>This is a simple HTML page.</p>
-    </main>
-    <footer>
-        <p>&copy; 2024 My Page</p>
-    </footer>
-    <script src="script.js"></script>
+    <div id="game-wrapper">
+        <div class="ui-overlay">
+            <div id="stats-bar-graphical" class="stats-bar-graphical">
+                <div class="stat-item-graphical"><strong>Score:</strong> <span id="player-score">0</span></div>
+                <div class="stat-item-graphical"><strong>Turns:</strong> <span id="turns-left">20</span></div>
+                <div class="stat-item-graphical"><strong>Age:</strong> <span id="queen-age-display">60</span></div>
+            </div>
+            <div id="player-services-display-graphical" class="services-display-graphical">
+                <h3 class="font-semibold">Your Services:</h3>
+                <div id="services-list-graphical" class="flex flex-wrap gap-1">
+                    </div>
+            </div>
+             <div id="game-phase-message" class="text-center font-bold text-xl my-2 text-red-400"></div>
+        </div>
+
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+        <div id="interaction-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3 id="modal-title" class="text-2xl font-bold mb-4 text-purple-700">Interact With...</h3>
+                <div id="pusher-details" class="mb-4 space-y-2"></div>
+                <div class="mb-4"><h4 class="font-semibold text-purple-600">Quarks:</h4><div id="pusher-quarks" class="flex flex-wrap gap-1"></div></div>
+                <div class="mb-4">
+                    <h4 class="font-semibold text-purple-600">Use Services (Can use one of each age-reducing type per encounter):</h4>
+                    <div id="services-options" class="space-y-2"></div>
+                    <p class="text-sm text-gray-600 mt-1">Selected services cost: <span id="selected-services-cost">0</span>. Penalty: <span id="selected-services-penalty">0</span>.</p>
+                    <p id="effective-age-info" class="text-sm text-purple-600 font-semibold mt-1"></p>
+                </div>
+                <div id="quark-flip-target-div" class="mb-4 hidden">
+                    <h4 class="font-semibold text-purple-600">Target Quark for Flip:</h4>
+                    <select id="quark-flip-select" class="w-full p-2 border rounded-md bg-white"></select>
+                </div>
+                <div id="pre-push-info" class="mb-4 p-3 bg-purple-50 rounded-md">
+                    <p class="text-sm">Queen's Current Effective Age for this try: <strong id="modal-effective-age">60</strong></p>
+                    <p class="text-sm">Estimated success chance with this guy (Age <span id="modal-guy-age"></span>): <strong id="modal-success-chance">0%</strong></p>
+                </div>
+                <div class="mb-6"><h4 class="font-semibold text-purple-600">Choose Approach (if successful push):</h4><div class="flex gap-4">
+                    <button id="safe-choice-btn" class="btn btn-secondary flex-1">Safe</button>
+                    <button id="risk-choice-btn" class="btn btn-danger flex-1">Risk</button>
+                </div></div>
+                <div class="flex justify-end gap-3">
+                    <button id="attempt-push-btn" class="btn btn-primary">Attempt Button Push!</button> 
+                    <button id="close-modal-btn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div id="store-modal" class="modal hidden">
+            <div class="modal-content"><h3 class="text-2xl font-bold mb-6 text-purple-700">The Backroom Store</h3><div id="store-items-container" class="space-y-3 mb-6"></div>
+                <div class="text-right"><button id="close-store-btn" class="btn btn-secondary">Close Store</button></div>
+            </div>
+        </div>
+        <div id="report-modal" class="modal hidden">
+            <div class="modal-content"><h3 class="text-2xl font-bold mb-4 text-purple-700">Interaction Report</h3><div id="report-content" class="space-y-2"></div>
+                <div class="text-right mt-6"><button id="close-report-btn" class="btn btn-primary">Continue</button></div>
+            </div>
+        </div>
+        <div id="game-over-modal" class="modal hidden">
+            <div class="modal-content text-center"><h3 id="game-over-title" class="text-3xl font-bold mb-4">Game Over!</h3>
+                <p id="game-over-message" class="text-lg mb-2"></p>
+                <p class="text-2xl mb-6">Final Score: <strong id="final-score" class="text-purple-600">0</strong></p>
+                <button id="restart-game-btn" class="btn btn-primary">Play Again?</button>
+            </div>
+        </div>
+    </div>
+    <div id="messageBox"></div>
+
+    <script>
+        // --- Canvas and Context ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+
+
+        // --- Game Configuration ---
+        const QUEEN_AGE = 60; // Updated Queen's default age
+        const MIN_GUY_AGE = 21;
+        const INITIAL_TURNS = 15;
+        const BONUS_ROUND_TURNS = 5;
+        const NUM_INITIAL_PUSHERS = 4;
+        const STD_CHANCE = 0.3;
+        const PLAYER_SPEED = 4;
+        const PIXEL_SCALE = 3; 
+        const PLAYER_SPRITE_WIDTH_PIXELS = 14; 
+        const PLAYER_SPRITE_HEIGHT_PIXELS = 22; 
+        
+        const NPC_SPRITE_HEIGHT = 32; 
+        const NPC_SPRITE_BODY_WIDTH = 18; 
+        const NPC_SPRITE_HEAD_RADIUS = 8; 
+        const INTERACTION_DISTANCE = 50; 
+
+
+        const LOCATIONS = { 
+            yourRoom: { name: "Your Room", points: 5 }, hisRoom: { name: "His Room", points: 10 }, weightRoom: { name: "Weight Room", points: 15 },
+            seamRoom: { name: "Seam Room", points: 20 }, coatRoom: { name: "Coat Room", points: 25 }, bathroom: { name: "Bathroom", points: 30 },
+            buttonRoom: { name: "Button Room", points: 40 }
+        };
+        const FREQUENCIES = {
+            onceAMonth: { name: "Once a Month", points: 50 }, twiceAMonth: { name: "Twice a Month", points: 40 },
+            onceAWeek: { name: "Once a Week", points: 30 }, resident: { name: "They Get Their Mail Here", points: 20 }
+        };
+        const TIREDNESS_LEVELS = {
+            energetic: { name: "Energetic", points: 30 }, average: { name: "Average", points: 20 }, tired: { name: "Tired", points: 10 }
+        };
+        const QUARK_TYPES = ["up", "down", "top", "bottom", "strange", "charm"];
+        const ALL_SERVICES = [
+            { id: "chatUp", name: "Chat Up", cost: 5, penalty: 1, ageReductionEffect: 5, description: "Appear 5 years younger." },
+            { id: "buyDrink", name: "Buy a Drink", cost: 10, penalty: 2, ageReductionEffect: 10, description: "Appear 10 years younger." },
+            { id: "complimentOutfit", name: "Compliment Outfit", cost: 15, penalty: 3, ageReductionEffect: 15, description: "Appear 15 years younger." },
+            { id: "mysteriousCharm", name: "Mysterious Charm", cost: 30, penalty: 5, description: "Unlocks special persuasions. Enables Quark Flip attempt." } // No age reduction
+        ];
+
+        // --- Game World Definition ---
+        const rooms = [ 
+            { id: 'lobby', x: 50, y: 50, width: 300, height: 200, color: '#4a4a6a', name: "Lobby", doors: [{ x: 350, y: 125, width: 20, height: 50, to: 'hallway', exitX: 70, exitY: 150 }] },
+            { id: 'hallway', x: 50, y: 300, width: 700, height: 100, color: '#5a5a7a', name: "Hallway", doors: [
+                { x: 200, y: 280, width: 50, height: 20, to: 'lobby', exitX: 150, exitY: 230 },
+                { x: 500, y: 400, width: 50, height: 20, to: 'buttonRoom', exitX: 150, exitY: 70 },
+                { x: 680, y: 325, width: 20, height: 50, to: 'storeRoom', exitX: 70, exitY: 150 }
+            ]},
+            { id: 'buttonRoom', x: 50, y: 450, width: 400, height: 100, color: '#4a4a6a', name: "Button Room", doors: [{ x: 225, y: 430, width: 50, height: 20, to: 'hallway', exitX: 500, exitY: 380 }] },
+            { id: 'storeRoom', x: 550, y: 50, width: 200, height: 200, color: '#6a6a8a', name: "Store", doors: [{ x: 530, y: 125, width: 20, height: 50, to: 'hallway', exitX: 660, exitY: 350 }] },
+        ];
+        let currentRoomIndex = 0;
+
+        // --- Game State ---
+        let player = { 
+            score: 0, services: {}, turnsLeft: INITIAL_TURNS, inBonusRound: false,
+            x: 100, y: 100, 
+            isMoving: false,
+            animationFrame: 0, 
+            lastMoveTime: 0,
+            animationInterval: 150 
+        };
+        let keys = {}; 
+        let npcPushers = []; 
+        let currentPushersData = []; 
+        let shopkeeperSprite = { 
+            x: 650, y: 150, width: NPC_SPRITE_BODY_WIDTH, height: NPC_SPRITE_HEIGHT, 
+            color: '#4caf50', headColor: '#a5d6a7', 
+            roomIndex: 3, type: 'shopkeeper', name: "Shopkeeper"
+        };
+        let interactableNPC = null; 
+        let interactionPromptEl = null;
+
+        // --- DOM Elements ---
+        const playerScoreEl = document.getElementById('player-score');
+        const turnsLeftEl = document.getElementById('turns-left');
+        const queenAgeDisplayEl = document.getElementById('queen-age-display'); 
+        const servicesListEl = document.getElementById('services-list-graphical'); 
+        const gamePhaseMessageEl = document.getElementById('game-phase-message');
+        const interactionModalEl = document.getElementById('interaction-modal');
+        const storeModalEl = document.getElementById('store-modal');
+        const reportModalEl = document.getElementById('report-modal');
+        const gameOverModalEl = document.getElementById('game-over-modal');
+        const messageBoxEl = document.getElementById('messageBox');
+        const modalEffectiveAgeEl = document.getElementById('modal-effective-age');
+        const modalGuyAgeEl = document.getElementById('modal-guy-age');
+        const modalSuccessChanceEl = document.getElementById('modal-success-chance');
+        const effectiveAgeInfoEl = document.getElementById('effective-age-info');
+        const attemptPushBtn = document.getElementById('attempt-push-btn');
+        const safeRiskChoiceDiv = interactionModalEl.querySelector('.mb-6'); 
+
+        // --- Player Pixel Art Sprite Definition (14x22 design) ---
+        const playerSpriteFrames = [ 
+            [ "   HHHHHHHH   ", "  HHHHHHHHHH  ", " HHHHSSEESSHHHH ", "HHH SSSSSSS HHH", "HH  SS LLL SS HH", "    CCCCCCCC    ", "   CCCCCCCCCC   ", "  CCCCCCCCCCCC  ", "  CCCCCCCCCCCC  ", "   CCCCCCCCCC   ", "    CCCCCCCC    ", "    CCCCCCCC    ", "     PPPPPP     ", "    PPPPPPPP    ", "   PPPPPPPPPP   ", "   PPP  PPPP    ", "  PPPPP  PP     ", "  PP XX   PP    ", " XXXX    XXXX   ", "XXXXXX  XXXXXX  ", "                ", "                " ],
+            [ "   HHHHHHHH   ", "  HHHHHHHHHH  ", " HHHHSSEESSHHHH ", "HHH SSSSSSS HHH", "HH  SS LLL SS HH", "    CCCCCCCC    ", "   CCCCCCCCCC   ", "  CCCCCCCCCCCC  ", "  CCCCCCCCCCCC  ", "   CCCCCCCCCC   ", "    CCCCCCCC    ", "    CCCCCCCC    ", "     PPPPPP     ", "    PPPPPPPP    ", "   PPPPPPPPPP   ", "    PPPP  PPP   ", "     PP  PPPPP  ", "    PP   XX PP  ", "   XXXX    XXXX ", "  XXXXXX  XXXXXX", "                ", "                " ]
+        ]; 
+        const playerSpriteColors = {
+            'H': '#D2691E', 'S': '#FFDAB9', 'C': '#FF69B4', 
+            'P': '#000000',  
+            'E': '#333333', 'X': '#A0522D',  
+            'L': '#FF007F'   
+        };
+
+
+        // --- Utility Functions ---
+        function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+        function getRandomElement(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        function showMessage(text, duration = 3000) { 
+            messageBoxEl.textContent = text;
+            messageBoxEl.classList.add('show');
+            setTimeout(() => { messageBoxEl.classList.remove('show'); }, duration);
+        }
+        function distance(x1, y1, x2, y2) { 
+            return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        }
+
+        // --- Game Logic ---
+        function initGame() {
+            player.score = 0; player.turnsLeft = INITIAL_TURNS; player.inBonusRound = false;
+            gamePhaseMessageEl.textContent = "";
+            player.services = { chatUp: 3, buyDrink: 2, complimentOutfit: 1 };
+            player.x = rooms[0].x + 50; 
+            player.y = rooms[0].y + 50; 
+            player.isMoving = false;
+            player.animationFrame = 0;
+            currentRoomIndex = 0;
+            
+            currentPushersData = []; npcPushers = [];
+            for (let i = 0; i < NUM_INITIAL_PUSHERS; i++) {
+                const pusherData = generateButtonPusherData();
+                currentPushersData.push(pusherData);
+                let npcRoomIndex = (i % 2 === 0) ? 0 : 2; 
+                if (i === NUM_INITIAL_PUSHERS -1 && rooms.length > 2) npcRoomIndex = 2;
+
+                npcPushers.push({
+                    x: rooms[npcRoomIndex].x + 50 + (i * 40) % (rooms[npcRoomIndex].width - 100),
+                    y: rooms[npcRoomIndex].y + 50 + (i * 20) % (rooms[npcRoomIndex].height - 100) + NPC_SPRITE_HEAD_RADIUS,
+                    width: NPC_SPRITE_BODY_WIDTH, height: NPC_SPRITE_HEIGHT,
+                    color: pusherData.isGroup ? '#DAA520' : '#ADD8E6', 
+                    headColor: pusherData.isGroup ? '#f0e68c' : '#d1e7f0', 
+                    dataIndex: i, roomIndex: npcRoomIndex, type: 'pusher',
+                    name: pusherData.name.substring(0,15) 
+                });
+            }
+            shopkeeperSprite.y = rooms[shopkeeperSprite.roomIndex].y + 100 + NPC_SPRITE_HEAD_RADIUS;
+
+            updateStatsDisplay(); 
+            closeAllModals();
+            if (!gameLoopRunning) gameLoop();
+        }
+
+        function generateButtonPusherData() { 
+            const age = getRandomInt(MIN_GUY_AGE, QUEEN_AGE + 5); 
+            const frequencyKey = getRandomElement(Object.keys(FREQUENCIES));
+            const tirednessKey = getRandomElement(Object.keys(TIREDNESS_LEVELS));
+            const locationKey = getRandomElement(Object.keys(LOCATIONS)); 
+            const lightsOn = Math.random() < 0.5;
+            let quarks = {};
+            QUARK_TYPES.forEach(q => { if (Math.random() < 0.4) quarks[q] = true; });
+            if (Object.keys(quarks).length === 0) quarks[getRandomElement(QUARK_TYPES)] = true;
+            let name = `Guy (Age ${age})`;
+            let isGroup = Math.random() < 0.15; 
+            if (isGroup) name = `Group (Avg. Age ${age})`;
+            return { id: Date.now() + Math.random(), name, age, frequency: FREQUENCIES[frequencyKey],
+                tiredness: TIREDNESS_LEVELS[tirednessKey], location: LOCATIONS[locationKey], 
+                lightsOn, quarks, hasSTD: Math.random() < STD_CHANCE, isGroup };
+        }
+
+        function calculateBasePoints(pusherData) { 
+            let basePoints = 0;
+            basePoints += pusherData.frequency.points;
+            basePoints += Math.abs(QUEEN_AGE - pusherData.age); // Still use original QUEEN_AGE for this point calculation
+            basePoints += pusherData.tiredness.points;
+            basePoints += pusherData.location.points; 
+            if (pusherData.lightsOn) basePoints += 10;
+            if (pusherData.isGroup) basePoints = Math.round(basePoints * 1.5);
+            return basePoints;
+        }
+        
+        function updateStatsDisplay() { 
+            playerScoreEl.textContent = player.score;
+            turnsLeftEl.textContent = player.turnsLeft;
+            updateQueenAgeDisplayUI(); 
+            
+            servicesListEl.innerHTML = '';
+            let hasServices = false;
+            for (const serviceId in player.services) {
+                if (player.services[serviceId] > 0) {
+                    hasServices = true;
+                    const service = ALL_SERVICES.find(s => s.id === serviceId);
+                    const serviceSpan = document.createElement('span');
+                    serviceSpan.textContent = `${service.name} (x${player.services[serviceId]})`;
+                    servicesListEl.appendChild(serviceSpan);
+                }
+            }
+            if (!hasServices) servicesListEl.innerHTML = '<span style="color:#aaa; font-size:0.8em;">No services.</span>';
+        }
+
+        function updateQueenAgeDisplayUI(effectiveAge = null) {
+            if (effectiveAge !== null && effectiveAge < QUEEN_AGE) {
+                queenAgeDisplayEl.innerHTML = `<del>${QUEEN_AGE}</del> ${effectiveAge}`;
+            } else {
+                queenAgeDisplayEl.textContent = QUEEN_AGE;
+            }
+        }
+        
+        let selectedPusherData = null; 
+        let selectedPusherSpriteIndex = -1; 
+        let currentEncounterEffectiveAge = QUEEN_AGE;
+
+        function startInteraction(pusherData, pusherSpriteVisualIndex) { 
+            selectedPusherData = pusherData;
+            selectedPusherSpriteIndex = pusherSpriteVisualIndex; 
+            usedServicesForCurrentInteraction = [];
+            currentEncounterEffectiveAge = QUEEN_AGE; 
+            
+            document.getElementById('modal-title').textContent = `Interact with ${pusherData.name}`;
+            const detailsEl = document.getElementById('pusher-details');
+            detailsEl.innerHTML = `
+                <p><strong>Age:</strong> ${pusherData.age}</p>
+                <p><strong>Frequents:</strong> ${pusherData.frequency.name}</p>
+                <p><strong>Energy Level:</strong> ${pusherData.tiredness.name}</p>
+                <p><strong>Original Location Context:</strong> ${pusherData.location.name}</p>
+                <p><strong>Lights (Context):</strong> ${pusherData.lightsOn ? 'On' : 'Off'}</p>
+            `; 
+            const quarksEl = document.getElementById('pusher-quarks');
+            quarksEl.innerHTML = Object.keys(pusherData.quarks).length > 0 ? 
+                Object.keys(pusherData.quarks).map(q => `<span class="quark-tag">${q}</span>`).join('') : 
+                '<span class="text-sm text-gray-500">No specific quirks noted.</span>';
+
+            renderServiceOptionsModal(); 
+            updateTemporaryAgeAndSuccessChanceDisplay(); 
+            checkMysteriousCharmModal(); 
+            
+            safeRiskChoiceDiv.classList.add('hidden'); 
+            attemptPushBtn.classList.remove('hidden'); 
+            interactionModalEl.classList.remove('hidden');
+        }
+
+        function calculateEffectiveQueenAge() {
+            let effectiveAge = QUEEN_AGE;
+            let reduction = 0;
+            usedServicesForCurrentInteraction.forEach(service => {
+                if (service.ageReductionEffect) {
+                    reduction += service.ageReductionEffect;
+                }
+            });
+            effectiveAge -= reduction;
+            return { currentEffectiveAge: Math.max(MIN_GUY_AGE -1, effectiveAge) , totalReduction: reduction}; 
+        }
+
+        function calculatePushSuccessChance(effectiveQueenAge, guyAge) {
+            const actualGuyAge = Math.max(MIN_GUY_AGE, guyAge);
+            if (actualGuyAge >= effectiveQueenAge) return 0.95; 
+            const ageDifference = effectiveQueenAge - actualGuyAge;
+            const MAX_CHANCE = 0.90; 
+            const MIN_CHANCE_AT_MAX_DIFF = 0.05; 
+            const MAX_POSSIBLE_EFFECTIVE_DIFFERENCE = QUEEN_AGE - MIN_GUY_AGE; 
+            if (MAX_POSSIBLE_EFFECTIVE_DIFFERENCE <= 0) return MAX_CHANCE; 
+            let penaltyRatio = Math.min(ageDifference / MAX_POSSIBLE_EFFECTIVE_DIFFERENCE, 1.0);
+            let chance = MAX_CHANCE - (penaltyRatio * (MAX_CHANCE - MIN_CHANCE_AT_MAX_DIFF));
+            return Math.max(MIN_CHANCE_AT_MAX_DIFF, Math.min(MAX_CHANCE, chance) ); 
+        }
+
+        function updateTemporaryAgeAndSuccessChanceDisplay() {
+            const { currentEffectiveAge, totalReduction } = calculateEffectiveQueenAge();
+            currentEncounterEffectiveAge = currentEffectiveAge;
+            updateQueenAgeDisplayUI(currentEncounterEffectiveAge); 
+            modalEffectiveAgeEl.textContent = currentEncounterEffectiveAge;
+            modalGuyAgeEl.textContent = selectedPusherData.age;
+            const successChance = calculatePushSuccessChance(currentEncounterEffectiveAge, selectedPusherData.age);
+            modalSuccessChanceEl.textContent = `${(successChance * 100).toFixed(1)}%`;
+            if (totalReduction > 0) {
+                effectiveAgeInfoEl.textContent = `Services make you appear ${totalReduction} years younger!`;
+            } else {
+                effectiveAgeInfoEl.textContent = "";
+            }
+        }
+
+        function renderServiceOptionsModal() { 
+            const servicesOptionsEl = document.getElementById('services-options');
+            servicesOptionsEl.innerHTML = '';
+            usedServicesForCurrentInteraction = []; 
+            ALL_SERVICES.forEach(service => {
+                if (player.services[service.id] && player.services[service.id] > 0) {
+                    const div = document.createElement('div');
+                    div.className = 'flex justify-between items-center py-1'; 
+                    const inputId = `service-check-${service.id}`;
+                    div.innerHTML = `
+                        <label for="${inputId}" class="text-sm cursor-pointer">
+                            ${service.name} (Avail: ${player.services[service.id]}) <span class="text-xs text-gray-500">- Cost: ${service.cost}pts, Penalty: ${service.penalty}pts. ${service.ageReductionEffect ? `Makes you seem ${service.ageReductionEffect}yrs younger.` : ''}</span>
+                            <p class="text-xs text-gray-500">${service.description}</p>
+                        </label>
+                        <input type="checkbox" id="${inputId}" data-service-id="${service.id}" class="form-checkbox h-5 w-5 text-purple-600 rounded service-checkbox">
+                    `;
+                    servicesOptionsEl.appendChild(div);
+                    div.querySelector('input').addEventListener('change', (event) => handleServiceSelectionModal(event, service));
+                }
+            });
+            if (servicesOptionsEl.innerHTML === '') {
+                servicesOptionsEl.innerHTML = '<p class="text-sm text-gray-500">You have no services to use. Visit the store!</p>';
+            }
+             updateSelectedServicesCostPenaltyModal(); 
+        }
+
+        function handleServiceSelectionModal(event, service) { 
+            const serviceId = service.id;
+            const isChecked = event.target.checked;
+            const existingServiceIndex = usedServicesForCurrentInteraction.findIndex(s => s.id === serviceId);
+
+            if (isChecked) {
+                // Allow only one instance of age-reducing services
+                if (service.ageReductionEffect) {
+                    const alreadyUsedThisType = usedServicesForCurrentInteraction.some(s => s.id === serviceId);
+                    if (alreadyUsedThisType) {
+                        event.target.checked = false; // Uncheck if trying to add a duplicate age-reducing service
+                        showMessage(`You can only use '${service.name}' once per encounter.`);
+                        return; // Stop processing
+                    }
+                }
+                // For non-age-reducing or first-time age-reducing, add if available
+                if (player.services[serviceId] > 0) {
+                     usedServicesForCurrentInteraction.push(service);
+                } else { 
+                    event.target.checked = false; 
+                    showMessage("You don't have that service type left!");
+                }
+            } else { // Unchecking
+                if (existingServiceIndex > -1) {
+                    usedServicesForCurrentInteraction.splice(existingServiceIndex, 1);
+                }
+            }
+            updateSelectedServicesCostPenaltyModal();
+            updateTemporaryAgeAndSuccessChanceDisplay(); 
+            checkMysteriousCharmModal();
+        }
+
+        function updateSelectedServicesCostPenaltyModal() { 
+            let totalCost = 0; let totalPenalty = 0;
+            usedServicesForCurrentInteraction.forEach(s => { totalCost += s.cost; totalPenalty += s.penalty; });
+            document.getElementById('selected-services-cost').textContent = totalCost;
+            document.getElementById('selected-services-penalty').textContent = totalPenalty;
+        }
+        function checkMysteriousCharmModal() { 
+            const charmUsed = usedServicesForCurrentInteraction.some(s => s.id === 'mysteriousCharm');
+            const quarkFlipDiv = document.getElementById('quark-flip-target-div');
+            const quarkFlipSelect = document.getElementById('quark-flip-select');
+            if (charmUsed && selectedPusherData && Object.keys(selectedPusherData.quarks).length > 0) {
+                quarkFlipDiv.classList.remove('hidden');
+                quarkFlipSelect.innerHTML = '<option value="">-- Select Quark to Flip --</option>';
+                Object.keys(selectedPusherData.quarks).forEach(q => {
+                    if(selectedPusherData.quarks[q]) {
+                         const option = document.createElement('option');
+                         option.value = q; option.textContent = q.charAt(0).toUpperCase() + q.slice(1);
+                         quarkFlipSelect.appendChild(option);
+                    }
+                });
+                if (quarkFlipSelect.options.length <=1) quarkFlipDiv.classList.add('hidden');
+            } else {
+                quarkFlipDiv.classList.add('hidden');
+                quarkFlipSelect.value = "";
+            }
+        }
+        
+        attemptPushBtn.addEventListener('click', () => {
+            let serviceCostForPlayer = 0;
+            usedServicesForCurrentInteraction.forEach(service => {
+                serviceCostForPlayer += service.cost;
+            });
+            if (player.score < serviceCostForPlayer) {
+                showMessage("Not enough points to use selected services!", 3000); return;
+            }
+            usedServicesForCurrentInteraction.forEach(service => {
+                if (player.services[service.id] > 0) {
+                    player.services[service.id]--; 
+                }
+            });
+            player.score -= serviceCostForPlayer;
+            updateStatsDisplay(); 
+            const { currentEffectiveAge: finalEffectiveAge, totalReduction } = calculateEffectiveQueenAge();
+            const successChance = calculatePushSuccessChance(finalEffectiveAge, selectedPusherData.age);
+            const isSuccessfulPush = Math.random() < successChance;
+            let reportMessage = `Engaging with ${selectedPusherData.name} (Age: ${selectedPusherData.age}).<br>`;
+            if (serviceCostForPlayer > 0) {
+                reportMessage += `Services used cost you ${serviceCostForPlayer} pts.<br>`;
+            }
+            if (totalReduction > 0) {
+                reportMessage += `Services made you appear ${totalReduction} years younger (Effective Age: ${finalEffectiveAge}).<br>`;
+            }
+            reportMessage += `Calculated chance for a successful push: ${(successChance * 100).toFixed(1)}%.<br>`;
+
+            if (isSuccessfulPush) {
+                reportMessage += `<strong class="text-green-600">Button push was SUCCESSFUL!</strong><br>`;
+                attemptPushBtn.classList.add('hidden');
+                safeRiskChoiceDiv.classList.remove('hidden');
+                interactionModalEl.dataset.successMessage = reportMessage; 
+            } else {
+                reportMessage += `<strong class="text-red-600">Button push was UNSUCCESSFUL this time.</strong><br>`;
+                player.turnsLeft--;
+                checkGamePhase();
+                showReport(reportMessage);
+                closeInteractionModal();
+                const originalDataIndex = npcPushers[selectedPusherSpriteIndex].dataIndex;
+                currentPushersData[originalDataIndex] = generateButtonPusherData(); 
+                npcPushers[selectedPusherSpriteIndex].color = currentPushersData[originalDataIndex].isGroup ? '#DAA520' : '#ADD8E6';
+                npcPushers[selectedPusherSpriteIndex].headColor = currentPushersData[originalDataIndex].isGroup ? '#f0e68c' : '#d1e7f0';
+                npcPushers[selectedPusherSpriteIndex].name = currentPushersData[originalDataIndex].name.substring(0,15);
+            }
+        });
+
+        function processInteractionAfterSafeRisk(choice) { 
+            if (!selectedPusherData) return;
+            let reportMessage = interactionModalEl.dataset.successMessage || "";
+            const { currentEffectiveAge: finalEffectiveAge } = calculateEffectiveQueenAge(); 
+            let quarkFlipBonus = 0;
+            let servicePenaltyFromServices = 0; 
+            usedServicesForCurrentInteraction.forEach(service => {
+                servicePenaltyFromServices += service.penalty;
+            });
+            const charmUsed = usedServicesForCurrentInteraction.some(s => s.id === 'mysteriousCharm');
+            const targetedQuark = document.getElementById('quark-flip-select').value;
+            if (charmUsed && targetedQuark && selectedPusherData.quarks[targetedQuark]) {
+                quarkFlipBonus = 50; 
+                reportMessage += `Successfully influenced the '${targetedQuark}' quark! +50 bonus points!<br>`;
+            }
+            let basePusherPoints = calculateBasePoints(selectedPusherData);
+            let pointsFromPusher = basePusherPoints - servicePenaltyFromServices; 
+            if (pointsFromPusher < 0) pointsFromPusher = 0;
+            let finalPointsThisEncounter = pointsFromPusher + quarkFlipBonus;
+            reportMessage += `Guy's base value: ${basePusherPoints} pts. Service penalty to guy's score: ${servicePenaltyFromServices} pts.<br>`;
+            if (quarkFlipBonus > 0) reportMessage += `Quark flip subtotal: ${finalPointsThisEncounter} pts.<br>`;
+            if (choice === 'safe') {
+                finalPointsThisEncounter *= 0.75;
+                reportMessage += `Chose SAFE. Points multiplied by 0.75.<br>`;
+            } else if (choice === 'risk') {
+                if (selectedPusherData.hasSTD) {
+                    finalPointsThisEncounter *= 0.5;
+                    reportMessage += `Chose RISK. Oh no, STD detected! Points multiplied by 0.5.<br>`;
+                    showMessage("Risky move... and it came with a Standard Task Detractor!", 3000);
+                } else {
+                    finalPointsThisEncounter *= 1.5;
+                    reportMessage += `Chose RISK. Lucky you, all clear! Points multiplied by 1.5.<br>`;
+                    showMessage("Risky move paid off! No STD detected.", 2500);
+                }
+            }
+            finalPointsThisEncounter = Math.round(finalPointsThisEncounter);
+            if (player.inBonusRound) { 
+                finalPointsThisEncounter *= 2;
+                reportMessage += `BONUS ROUND! Points doubled!<br>`;
+            }
+            player.score += finalPointsThisEncounter; 
+            reportMessage += `Final points from this interaction: ${finalPointsThisEncounter} pts.<br>`;
+            reportMessage += `Your new total score: ${player.score} pts.`;
+            showReport(reportMessage);
+            const originalDataIndex = npcPushers[selectedPusherSpriteIndex].dataIndex;
+            currentPushersData[originalDataIndex] = generateButtonPusherData(); 
+            npcPushers[selectedPusherSpriteIndex].color = currentPushersData[originalDataIndex].isGroup ? '#DAA520' : '#ADD8E6';
+            npcPushers[selectedPusherSpriteIndex].headColor = currentPushersData[originalDataIndex].isGroup ? '#f0e68c' : '#d1e7f0';
+            npcPushers[selectedPusherSpriteIndex].name = currentPushersData[originalDataIndex].name.substring(0,15);
+            player.turnsLeft--;
+            checkGamePhase();
+            closeInteractionModal();
+            updateStatsDisplay(); 
+        }
+        
+        function showReport(content) { 
+            document.getElementById('report-content').innerHTML = content;
+            reportModalEl.classList.remove('hidden');
+        }
+        function checkGamePhase() { 
+            if (player.turnsLeft === BONUS_ROUND_TURNS && !player.inBonusRound) {
+                player.inBonusRound = true;
+                gamePhaseMessageEl.textContent = "BONUS ROUND! Points Doubled!";
+                showMessage("Nearly checkout! BONUS ROUND: Points doubled!", 5000);
+            }
+            if (player.turnsLeft <= 0) gameOver();
+        }
+        function gameOver() { 
+            gamePhaseMessageEl.textContent = "FINAL CALL! Game Over.";
+            document.getElementById('game-over-title').textContent = player.inBonusRound ? "Checkout Complete!" : "Time's Up!";
+            document.getElementById('game-over-message').textContent = "The Buttonhouse adventure ends...";
+            document.getElementById('final-score').textContent = player.score;
+            gameOverModalEl.classList.remove('hidden');
+        }
+        function openStore() { 
+            const storeItemsEl = document.getElementById('store-items-container');
+            storeItemsEl.innerHTML = '';
+            ALL_SERVICES.forEach(service => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex justify-between items-center p-3 bg-purple-50 rounded-lg'; 
+                itemDiv.innerHTML = `<div><h4 class="font-semibold text-purple-700">${service.name}</h4><p class="text-sm text-gray-600">${service.description}</p><p class="text-sm font-medium text-purple-500">Cost: ${service.cost} pts</p></div><button data-service-id="${service.id}" class="btn btn-primary buy-service-btn text-sm py-2 px-3">Buy</button>`;
+                storeItemsEl.appendChild(itemDiv);
+            });
+            document.querySelectorAll('.buy-service-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const serviceIdToBuy = e.target.dataset.serviceId;
+                    const serviceToBuy = ALL_SERVICES.find(s => s.id === serviceIdToBuy);
+                    if (player.score >= serviceToBuy.cost) {
+                        player.score -= serviceToBuy.cost;
+                        player.services[serviceIdToBuy] = (player.services[serviceIdToBuy] || 0) + 1;
+                        showMessage(`Purchased ${serviceToBuy.name}!`, 2000);
+                        updateStatsDisplay();
+                    } else { showMessage("Not enough points.", 2000); }
+                });
+            });
+            storeModalEl.classList.remove('hidden');
+        }
+        
+        function closeInteractionModal() { 
+            interactionModalEl.classList.add('hidden');
+            selectedPusherData = null; selectedPusherSpriteIndex = -1;
+            usedServicesForCurrentInteraction = []; 
+            document.querySelectorAll('.service-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('quark-flip-target-div').classList.add('hidden');
+            document.getElementById('quark-flip-select').value = "";
+            updateQueenAgeDisplayUI(); 
+            delete interactionModalEl.dataset.successMessage;
+        }
+        function closeAllModals() { 
+            interactionModalEl.classList.add('hidden'); storeModalEl.classList.add('hidden');
+            reportModalEl.classList.add('hidden'); gameOverModalEl.classList.add('hidden');
+            updateQueenAgeDisplayUI(); // Ensure age display is reset if modals closed abruptly
+        }
+
+        // --- Input Handling ---
+        window.addEventListener('keydown', (e) => { keys[e.key.toLowerCase()] = true; });
+        window.addEventListener('keyup', (e) => {
+            keys[e.key.toLowerCase()] = false;
+            if ((e.key === ' ' || e.key === 'Enter') && interactableNPC) {
+                if (interactableNPC.type === 'pusher') {
+                    const pusherData = currentPushersData[interactableNPC.dataIndex];
+                    const spriteVisualIndex = npcPushers.findIndex(npc => npc === interactableNPC);
+                    startInteraction(pusherData, spriteVisualIndex);
+                } else if (interactableNPC.type === 'shopkeeper') {
+                    openStore();
+                }
+            }
+        });
+
+        // --- Movement and Collision ---
+        function updatePlayerPosition() {
+            if (interactionModalEl.classList.contains('hidden') && 
+                storeModalEl.classList.contains('hidden') &&
+                reportModalEl.classList.contains('hidden') &&
+                gameOverModalEl.classList.contains('hidden')) { 
+                let dx = 0; let dy = 0;
+                let moved = false;
+                if (keys['w'] || keys['arrowup']) { dy -= PLAYER_SPEED; moved = true; }
+                if (keys['s'] || keys['arrowdown']) { dy += PLAYER_SPEED; moved = true; }
+                if (keys['a'] || keys['arrowleft']) { dx -= PLAYER_SPEED; moved = true; }
+                if (keys['d'] || keys['arrowright']) { dx += PLAYER_SPEED; moved = true; }
+                player.isMoving = moved;
+                if (player.isMoving) {
+                    const currentTime = Date.now();
+                    if (currentTime - player.lastMoveTime > player.animationInterval) {
+                        player.animationFrame = (player.animationFrame + 1) % playerSpriteFrames.length;
+                        player.lastMoveTime = currentTime;
+                    }
+                } else {
+                    player.animationFrame = 0; 
+                }
+                let newPlayerX = player.x + dx;
+                let newPlayerY = player.y + dy;
+                const room = rooms[currentRoomIndex];
+                const playerVisualWidth = PLAYER_SPRITE_WIDTH_PIXELS * PIXEL_SCALE;
+                const playerVisualHeight = PLAYER_SPRITE_HEIGHT_PIXELS * PIXEL_SCALE;
+                if (newPlayerX < room.x) newPlayerX = room.x;
+                if (newPlayerX + playerVisualWidth > room.x + room.width) newPlayerX = room.x + room.width - playerVisualWidth;
+                if (newPlayerY < room.y) newPlayerY = room.y;
+                if (newPlayerY + playerVisualHeight > room.y + room.height) newPlayerY = room.y + room.height - playerVisualHeight;
+                player.x = newPlayerX;
+                player.y = newPlayerY;
+                const playerHitboxLeft = player.x + playerVisualWidth * 0.1;
+                const playerHitboxRight = player.x + playerVisualWidth * 0.9;
+                const playerHitboxTop = player.y + playerVisualHeight * 0.1;
+                const playerHitboxBottom = player.y + playerVisualHeight * 0.9;
+                room.doors.forEach(door => {
+                    if (playerHitboxRight > door.x && playerHitboxLeft < door.x + door.width &&
+                        playerHitboxBottom > door.y && playerHitboxTop < door.y + door.height) {
+                        const nextRoomIndex = rooms.findIndex(r => r.id === door.to);
+                        if (nextRoomIndex !== -1) {
+                            currentRoomIndex = nextRoomIndex;
+                            player.x = door.exitX; 
+                            player.y = door.exitY; 
+                        }
+                    }
+                });
+            } else {
+                player.isMoving = false; 
+            }
+        }
+        
+        function checkInteractions() {
+            interactableNPC = null; 
+            const playerVisualWidth = PLAYER_SPRITE_WIDTH_PIXELS * PIXEL_SCALE;
+            const playerVisualHeight = PLAYER_SPRITE_HEIGHT_PIXELS * PIXEL_SCALE;
+            const playerCenterX = player.x + playerVisualWidth / 2; 
+            const playerCenterY = player.y + playerVisualHeight / 2;
+            npcPushers.forEach(npc => {
+                if (npc.roomIndex === currentRoomIndex) {
+                    const npcBodyCenterX = npc.x + NPC_SPRITE_BODY_WIDTH / 2;
+                    const npcSpriteAnchorY = npc.y; 
+                    if (distance(playerCenterX, playerCenterY, npcBodyCenterX, npcSpriteAnchorY) < INTERACTION_DISTANCE) { 
+                        interactableNPC = npc; return; 
+                    }
+                }
+            });
+            if (!interactableNPC && shopkeeperSprite.roomIndex === currentRoomIndex) {
+                 const shopBodyCenterX = shopkeeperSprite.x + NPC_SPRITE_BODY_WIDTH / 2;
+                 const shopSpriteAnchorY = shopkeeperSprite.y; 
+                 if (distance(playerCenterX, playerCenterY, shopBodyCenterX, shopSpriteAnchorY) < INTERACTION_DISTANCE) {
+                    interactableNPC = shopkeeperSprite;
+                 }
+            }
+            if (interactionPromptEl) {
+                if(interactionPromptEl.parentNode) {
+                    interactionPromptEl.parentNode.removeChild(interactionPromptEl);
+                }
+                interactionPromptEl = null;
+            }
+            if (interactableNPC) {
+                interactionPromptEl = document.createElement('div');
+                interactionPromptEl.className = 'interaction-prompt';
+                interactionPromptEl.textContent = `Press [Space] or [Enter] to talk to ${interactableNPC.name || 'Guy'}`;
+                const canvasRect = canvas.getBoundingClientRect();
+                document.body.appendChild(interactionPromptEl); 
+                let promptTargetX, promptTargetY;
+                promptTargetX = interactableNPC.x + NPC_SPRITE_BODY_WIDTH / 2; 
+                promptTargetY = interactableNPC.y - NPC_SPRITE_HEAD_RADIUS; 
+                const promptLeft = canvasRect.left + promptTargetX - (interactionPromptEl.offsetWidth / 2);
+                const promptTop = canvasRect.top + promptTargetY - interactionPromptEl.offsetHeight - 5;
+                interactionPromptEl.style.position = 'absolute'; 
+                interactionPromptEl.style.left = `${promptLeft}px`;
+                interactionPromptEl.style.top = `${promptTop}px`;
+            }
+        }
+
+        // --- Rendering ---
+        function drawRoom(room) { 
+            ctx.fillStyle = room.color;
+            ctx.fillRect(room.x, room.y, room.width, room.height);
+            ctx.strokeStyle = '#ccc';
+            ctx.strokeRect(room.x, room.y, room.width, room.height);
+            room.doors.forEach(door => {
+                ctx.fillStyle = '#8B4513'; 
+                ctx.fillRect(door.x, door.y, door.width, door.height);
+            });
+            ctx.fillStyle = 'white'; ctx.font = '16px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText(room.name, room.x + room.width / 2, room.y + 20);
+        }
+
+        function drawPlayerPixelArt() {
+            const frameData = playerSpriteFrames[player.animationFrame];
+            if (!frameData) return;
+            for (let r = 0; r < frameData.length; r++) { 
+                for (let c = 0; c < frameData[r].length; c++) { 
+                    const pixelChar = frameData[r][c];
+                    if (pixelChar !== ' ') { 
+                        ctx.fillStyle = playerSpriteColors[pixelChar] || '#FF00FF'; 
+                        ctx.fillRect(
+                            player.x + (c * PIXEL_SCALE),
+                            player.y + (r * PIXEL_SCALE),
+                            PIXEL_SCALE,
+                            PIXEL_SCALE
+                        );
+                    }
+                }
+            }
+        }
+
+        function drawDetailedNPC(sprite) { 
+            const headCenterX = sprite.x + sprite.width / 2;
+            const headCenterY = sprite.y; 
+            const bodyTopY = headCenterY + NPC_SPRITE_HEAD_RADIUS;
+            const bodyHeight = NPC_SPRITE_HEIGHT - (NPC_SPRITE_HEAD_RADIUS * 2);
+            const eyeColor = '#333';
+            ctx.fillStyle = sprite.color; 
+            ctx.fillRect(sprite.x, bodyTopY, sprite.width, bodyHeight);
+            ctx.beginPath();
+            ctx.arc(headCenterX, headCenterY, NPC_SPRITE_HEAD_RADIUS, 0, Math.PI * 2);
+            ctx.fillStyle = sprite.headColor || sprite.color; 
+            ctx.fill();
+            ctx.strokeStyle = eyeColor; 
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.fillStyle = eyeColor;
+            const eyeRadius = 1.5;
+            const eyeOffsetX = NPC_SPRITE_HEAD_RADIUS * 0.35;
+            const eyeOffsetY = NPC_SPRITE_HEAD_RADIUS * 0.1; 
+            ctx.beginPath(); 
+            ctx.arc(headCenterX - eyeOffsetX, headCenterY - eyeOffsetY, eyeRadius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath(); 
+            ctx.arc(headCenterX + eyeOffsetX, headCenterY - eyeOffsetY, eyeRadius, 0, Math.PI * 2);
+            ctx.fill();
+            if (sprite.type === 'pusher' && currentPushersData[sprite.dataIndex]?.isGroup) {
+                ctx.beginPath();
+                ctx.arc(headCenterX, headCenterY, NPC_SPRITE_HEAD_RADIUS + 4, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(255, 215, 0, 0.5)'; 
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            }
+        }
+
+        function renderGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); 
+            const room = rooms[currentRoomIndex];
+            drawRoom(room);
+            drawPlayerPixelArt(); 
+            npcPushers.forEach(npc => {
+                if (npc.roomIndex === currentRoomIndex) {
+                    drawDetailedNPC(npc); 
+                }
+            });
+            if (shopkeeperSprite.roomIndex === currentRoomIndex) {
+                drawDetailedNPC(shopkeeperSprite); 
+            }
+        }
+
+        // --- Game Loop ---
+        let gameLoopRunning = false;
+        let lastFrameTime = 0;
+        function gameLoop(currentTime) {
+            if (!lastFrameTime) lastFrameTime = currentTime;
+            lastFrameTime = currentTime;
+            gameLoopRunning = true;
+            updatePlayerPosition(); 
+            checkInteractions(); 
+            renderGame();
+            if (player.turnsLeft > 0 || gameOverModalEl.classList.contains('hidden')) {
+                 requestAnimationFrame(gameLoop);
+            } else {
+                gameLoopRunning = false; 
+            }
+        }
+
+        // --- Event Listeners for Modals ---
+        document.getElementById('close-modal-btn').addEventListener('click', closeInteractionModal);
+        document.getElementById('safe-choice-btn').addEventListener('click', () => processInteractionAfterSafeRisk('safe'));
+        document.getElementById('risk-choice-btn').addEventListener('click', () => processInteractionAfterSafeRisk('risk'));
+        
+        document.getElementById('close-store-btn').addEventListener('click', () => storeModalEl.classList.add('hidden'));
+        document.getElementById('close-report-btn').addEventListener('click', () => reportModalEl.classList.add('hidden'));
+        document.getElementById('restart-game-btn').addEventListener('click', () => {
+            gameOverModalEl.classList.add('hidden');
+            initGame(); 
+        });
+        document.querySelectorAll('input[type="checkbox"], button').forEach(el => {
+            el.addEventListener('mouseup', (e) => e.target.blur());
+        });
+
+        // --- Initialise Game ---
+        initGame();
+    </script>
 </body>
 </html>
